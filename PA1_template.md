@@ -6,7 +6,8 @@ output:
 ---
 
 ## Loading and preprocessing the data
-```{r loaddata, echo=TRUE}
+
+```r
 # Import library
 library(knitr)
 library(plyr)
@@ -21,25 +22,43 @@ complete.case <- na.omit(data)
 
 
 ## What is mean total number of steps taken per day?
-```{r totalnumber, echo=TRUE}
+
+```r
 # Calculate total number of steps taken each day
 total.number <- aggregate(complete.case$steps, by = list(category=complete.case$date), FUN = sum)
 
 # Create a histogram of total number following the Freedman-Diaconis rule to determine breaks
 hist(total.number$x, breaks="FD", xlab="total steps",main="Histogram of Total Steps")
+```
 
+![plot of chunk totalnumber](figure/totalnumber-1.png) 
+
+```r
 # Calculate the mean and median total number of steps taken each day
 summary <- summary(total.number$x)
 
 # Report the median of total number of steps taken each day
 print(summary[3],type="html")
+```
 
+```
+## Median 
+##  10760
+```
+
+```r
 # Report the mean of total number of steps taken each day
 print(summary[4],type="html")
 ```
 
+```
+##  Mean 
+## 10770
+```
+
 ## What is the average daily activity pattern?
-```{r activityPattern, echo=TRUE}
+
+```r
 # Calculate the average number of steps 
 attach(complete.case)
 pattern <- aggregate(steps ~ interval, FUN = mean)
@@ -49,7 +68,11 @@ detach(complete.case)
 # Create time series plot 
 plot(pattern$mean ~ pattern$interval, type="l", 
      main="Average Daily Activity", xlab="5-minute intervals",ylab="Average Steps")
+```
 
+![plot of chunk activityPattern](figure/activityPattern-1.png) 
+
+```r
 # Which 5-minute interval has the max number of steps? 
 loc <- which(pattern==max(pattern$mean), arr.ind=TRUE)
 max.interval <- pattern[loc[1],]$interval
@@ -57,11 +80,22 @@ phrase <- paste("The ", max.interval," interval contains the maximum average num
 print(phrase, type="html")
 ```
 
+```
+## [1] "The  835  interval contains the maximum average number of steps"
+```
+
 ## Imputing missing values
-```{r missingValues, echo=TRUE}
+
+```r
 # total number of missing values
 sum(is.na(data$steps))
+```
 
+```
+## [1] 2304
+```
+
+```r
 # Use means of 5-minute intervals to impute missing values
 
 data.new <- join(data,pattern,by="interval",type="left")
@@ -73,15 +107,31 @@ total.number <- aggregate(data.new$steps, by = list(category=data.new$date), FUN
 
 # Create a histogram of total number following the Freedman-Diaconis rule to determine breaks
 hist(total.number$x, breaks="FD", xlab="total steps",main="Histogram of Total Steps")
+```
 
+![plot of chunk missingValues](figure/missingValues-1.png) 
+
+```r
 # Calculate the mean and median total number of steps taken each day
 summary <- summary(total.number$x)
 
 # Report the median of total number of steps taken each day
 print(summary[3],type="html")
+```
 
+```
+## Median 
+##  10770
+```
+
+```r
 # Report the mean of total number of steps taken each day
 print(summary[4],type="html")
+```
+
+```
+##  Mean 
+## 10770
 ```
 **Do these values differ from the estimates from the first part of the assignment?**
 - The median (10770) of imputing missing dataset is slightly greater than that (10760) of complete cases.
@@ -92,7 +142,8 @@ print(summary[4],type="html")
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r weekdays}
+
+```r
 # Use weekdays() to find the day of the week
 data.new$day <- weekdays(as.Date(data.new$date))
 
@@ -110,3 +161,5 @@ g <- g + labs(x="Interval",y="Number of Steps")
 g <- g + facet_grid(week~.)
 g 
 ```
+
+![plot of chunk weekdays](figure/weekdays-1.png) 
